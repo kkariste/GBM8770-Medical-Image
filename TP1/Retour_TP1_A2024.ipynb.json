@@ -1,0 +1,310 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "748d115b",
+   "metadata": {},
+   "source": [
+    "# Retour TP1\n",
+    "\n",
+    "## Quelques statistiques\n",
+    "- Moyenne: 17.95 / 20\n",
+    "- Écart-type: 0.73\n",
+    "- Médiane: 18.03 / 20\n",
+    "\n",
+    "Bravo ! "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "df4584f8",
+   "metadata": {},
+   "source": [
+    "## Cellules Markdown\n",
+    "Utilisez des cellules Markdown pour vos discussions plutôt que des `print` ou des commentaires. Pour changer le type de cellule en Markdown, allez dans `Cell > Cell Type > Markdown` ou bien sélectionnez la cellule et appuyez sur la touche `m`.\n",
+    "\n",
+    "Vous pouvez mettre votre texte en **gras** (`**texte**`) ou en *italique* (`*texte*`).\n",
+    "\n",
+    "Vous pouvez également utiliser de la syntaxe LaTeX directement dans vos cellules, soit *inline* ($e^{i \\pi} = -1$  avec `$e^{i \\pi} = -1$`) ou sur une ligne distincte: $$e^{i \\pi} = -1$$ (avec `$$e^{i \\pi} = -1$$`).\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "75831bd7",
+   "metadata": {},
+   "source": [
+    "## Réponses aux questions\n",
+    "\n",
+    "On ne veut pas avoir à deviner vos réponses. Quand on vous demande d'expliciter une relation, ou de vérifier ou de comparer des valeurs, faites nous au minimum une phrase complète. Ça ne veut pas dire d'être verbeux, mais on ne veut pas avoir à interpréter nous-même vos réponses. Elles doivent être claires. \n",
+    "\n",
+    "Beaucoup ont perdu des points parce qu'ils n'ont pas explicité leurs réponses, ou même pas répondu aux questions du tout. \n",
+    "\n",
+    "Par exemple, quand on vous demande la largeur de la tumeur, on ne veut pas avoir à la calculer à partir des coordonnées que vous affichez. Il aurait fallu avoir une réponse claire : la tumeur mesure X pixels. \n",
+    "\n",
+    "N'oubliez pas les unités ! "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "9ee04591-c032-494b-bba5-dfc36bb30e47",
+   "metadata": {},
+   "source": [
+    "## Affichage d'une image\n",
+    "Prenez l'habitude d'afficher des images en tons de gris avec une colormap appropriée (``cmap='gray'`` par exemple)\n",
+    "\n",
+    "Et n'oubliez pas d'afficher les images lorsque demandé, ce sont des points gratuits ! "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "f550028b-fbeb-4743-a5dc-7f232593537c",
+   "metadata": {},
+   "source": [
+    "## ChatGPT\n",
+    "On se doute bien que plusieurs d'autres vous l'utilisez, ou un outil d'IA générative semblable. C'est ok. On a cependant revérifié avec Farida et dans le plan de cours, et il faudrait **indiquer comment et quand vous l'avez utilisé**. À vous de voir si vous voulez indiquer à un seul endroit (une seule cellule) toutes vos utilisations, ou l'indiquer à chaque cellule. "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "325e3aaf",
+   "metadata": {},
+   "source": [
+    "## Librairies\n",
+    "Utilisez les librairies qu'on vous donne ! \n",
+    "\n",
+    "Évitez les boucles **for** pour itérer à travers un vecteur ou pire les double boucles **for** pour itérer à travers une image. Il existe très probablement une fonction *numpy* qui fait le travail pour vous de façon beaucoup plus efficace.\n",
+    "\n",
+    "<p style='color: red;'>\n",
+    " <strong>N'importez pas de nouvelles librairies ou nouvelles fonctions, on veut que vous travailliez avec les outils qu'on vous donne. </strong>\n",
+    "</p>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "8c51d5eb",
+   "metadata": {},
+   "source": [
+    "## Exécution du code, chemins vers les images, etc. "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "54261c41",
+   "metadata": {},
+   "source": [
+    "Il est fort probable que pendant la correction, on souhaite vérifier certaines choses dans votre code. Il faut qu'on soit capable de l'exécuter ! Pour cela, quelques points :\n",
+    "* N'utilisez pas des chemins d'accès *absolus* (comme par exemple \"C:\\users\\moi\\GBM8770\\TP1\\...\"), utilisez des chemins d'accès relatifs aux fichiers présents dans le dossier zippé que vous nous fournissez\n",
+    "* Assurez vous que **toutes** les images et fichiers soient présents dans le dossier zippé\n",
+    "* Assurez-vous qu'on puisse exécuter votre notebook en entier sans générer d'erreurs (Utilisez `Kernel > Restart & Run All`)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "5c5b40c8",
+   "metadata": {},
+   "source": [
+    "## Séance 1 - Calcul de l'intensité moyenne, le contraste ou le CNR dans une région\n",
+    "\n",
+    "Plusieurs équipes ont perdu des points dans le calcul de l'intensité moyenne, le contraste ou le CNR d'une région. Utilisez les masques qui représentent la région d'intérêt pour indexer les valeurs qui vous intéressent ! Ils sont là pour ça.  "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "id": "38e29bb6",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# lire l'image oct\n",
+    "oct = imread(\"oct.png\")\n",
+    "\n",
+    "# lire les segmentations individuelles de la RPE\n",
+    "rpe_left = np.load(\"mask_rpe_left.npy\").astype(bool)\n",
+    "rpe_right = np.load(\"mask_rpe_right.npy\").astype(bool)\n",
+    "\n",
+    "# regrouper les segmentations en une seule\n",
+    "rpe = np.logical_or(rpe_left, rpe_right)\n",
+    "\n",
+    "# calcul du masque du fond de l'oeil\n",
+    "back = np.ones(oct.shape)\n",
+    "retina = np.load(\"mask_retina.npy\").astype(bool)\n",
+    "back = (back - retina).astype(bool)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "441c0cd3",
+   "metadata": {},
+   "source": [
+    "On peut vérifier le type de notre masque avec l'attribut `dtype`"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 18,
+   "id": "cd9e45da",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "dtype('bool')"
+      ]
+     },
+     "execution_count": 18,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "back.dtype"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 19,
+   "id": "daacdbdd",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "-- Intensités Moyennes --\n",
+      "RPE: 0.6968\n",
+      "Fond: 0.0926\n",
+      "\n",
+      "-- Contraste --\n",
+      "RPE: 6.53\n"
+     ]
+    }
+   ],
+   "source": [
+    "mean_rpe = oct[rpe].mean()\n",
+    "mean_fond = oct[back].mean()\n",
+    "\n",
+    "print(\"-- Intensités Moyennes --\")\n",
+    "print(\"RPE: %.4f\" % mean_rpe)\n",
+    "print(\"Fond: %.4f\" % mean_fond)\n",
+    "\n",
+    "print(\"\")\n",
+    "print(\"-- Contraste --\")\n",
+    "print(\"RPE: %.2f\" % (np.abs(mean_rpe - mean_fond) / mean_fond))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "02343f9f",
+   "metadata": {},
+   "source": [
+    "# Autres bonnes pratiques\n",
+    "\n",
+    "## f-strings en Python\n",
+    "Depuis Python 3.6, vous pouvez formatter vos strings avec des **f-strings**."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 23,
+   "id": "84688d06",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "x = 2\n"
+     ]
+    }
+   ],
+   "source": [
+    "x = 2\n",
+    "print(f\"x = {x}\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 24,
+   "id": "9a138aac",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "x = 1.41\n"
+     ]
+    }
+   ],
+   "source": [
+    "import numpy as np\n",
+    "\n",
+    "x = np.sqrt(2)\n",
+    "print(f\"x = {x:.2f}\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "6ee2fd3d",
+   "metadata": {},
+   "source": [
+    "## Indexage avec Numpy\n",
+    "### Indexage d'images et de matrices\n",
+    "Rappelez vous qu'une image est représentée dans Numpy comme une **matrice**, et qu'on l'indexe comme une matrice: `img[ligne, colonne]`.\n",
+    "\n",
+    "### Indexage par *slice*\n",
+    "L'indexage de *slices* se fait avec `x[start_inclus:stop_exclu:step]`.\n",
+    "- Les index commencent à 0\n",
+    "- Par défaut on commence à 0 et on se rend jusqu'à la fin (`len(x)`)\n",
+    "\n",
+    "## Bonnes pratiques de programmation\n",
+    "### Opérations répétées\n",
+    "Si vous répétez une opération plus qu'une fois, mettez la dans une boucle ou dans une fonction!\n",
+    "1. Vous diminuez significativement le risque de faire une erreur si vous décidez de changer un paramètre\n",
+    "2. Votre code devient **beaucoup** plus lisible (et plus facile à corriger...)\n",
+    "\n",
+    "## Autres considérations\n",
+    "- Attention à hard code des valeurs spécifiques! Ex.: utilisez `len(x)`, ou calculez une valeur et gardez la dans une variable pour la réutiliser\n",
+    "- Utilisez des noms de variables descriptifs: pas de `image3`, `skrillex`, ça rend le code dur à suivre. Privilégiez plutôt: `fundus`, `masque_choroide`, etc.\n",
+    "- Évitez de mettre plusieurs statements séparés par des virgules sur la même ligne, c'est une mauvaise pratique\n",
+    "- Évitez les boucles sur des matrices! Utilisez l'indexage Numpy!\n",
+    "- Initialisez vos masques avec l'argument `dtype=bool`: `masque = np.zeros_like(img, dtype=bool)`\n",
+    "- Vous avez la meilleure calculatrice que vous pouvez imaginer devant vous: utilisez là! \n",
+    "- Assurez vous que votre code fonctionne avant de remettre les notebooks. Utilisez `Kernel > Restart & Run All`\n",
+    "- Attention à l'indentation\n",
+    "    - On n'a pas de blocs avec des accolades en Python, donc l'indentation est essentielle\n",
+    "    - Convention: toujours 4 espaces\n",
+    "- Attention à ne pas afficher des signaux complexes avec matplotlib, vous ne savez jamais trop ça donne quoi"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "96251e7b",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python (tpGBM 3.12)",
+   "language": "python",
+   "name": "tpgbm2024_312"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.12.4"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
